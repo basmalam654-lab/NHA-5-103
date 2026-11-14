@@ -24,7 +24,7 @@ Users: a shipping and logistics manager and an executive finance manager. Output
 ## Folders
 
 ```
-data/raw/snapshot_2026-11-08/   frozen data + CHECKSUMS.txt
+data/raw/snapshot_2026-11-08/   frozen data
 sql/bronze/                     Bronze table scripts and BULK INSERT
 dbt_project/                    Silver and Gold (models, seeds, tests, macros)
 python/notebooks/               numbered analysis notebooks
@@ -40,7 +40,6 @@ docs/                           data dictionary, schema, Step 4 documents
 3. In the repo folder: `python -m venv .venv`, activate it, then `pip install -r requirements.txt`
 4. Run `nbstripout --install` once, so notebook outputs are cleared automatically.
 5. Copy `dbt_project/profiles.example.yml` to your own dbt folder as `profiles.yml` (never commit it).
-6. Check your data files against `data/raw/snapshot_2026-11-08/CHECKSUMS.txt`.
 
 ## Workflow (shared repo, pull requests)
 
