@@ -181,33 +181,33 @@ GO
 
 -- 16. Row Count
 SELECT COUNT(*) AS TotalRows
-FROM bronze.[portwatch_disruptions_database_-3978591324501330360 (1)];
+FROM bronze.[portwatch_disruptions_database(1)];
 GO
 
 -- 17. Duplicate Event IDs
 SELECT eventid, COUNT(*) AS DuplicateCount
-FROM bronze.[portwatch_disruptions_database_-3978591324501330360 (1)]
+FROM bronze.[portwatch_disruptions_database(1)]
 GROUP BY eventid
 HAVING COUNT(*) > 1;
 GO
 
 -- 18. Duplicate Object IDs
 SELECT ObjectId, COUNT(*) AS DuplicateCount
-FROM bronze.[portwatch_disruptions_database_-3978591324501330360 (1)]
+FROM bronze.[portwatch_disruptions_database(1)]
 GROUP BY ObjectId
 HAVING COUNT(*) > 1;
 GO
 
 -- 19. Event Date Validation
 SELECT eventid, eventname, fromdate, todate
-FROM bronze.[portwatch_disruptions_database_-3978591324501330360 (1)]
+FROM bronze.[portwatch_disruptions_database(1)]
 WHERE fromdate IS NULL
    OR (todate IS NOT NULL AND todate < fromdate);
 GO
 
 -- 20. Event Coordinates Validation
 SELECT eventid, eventname, lat, long
-FROM bronze.[portwatch_disruptions_database_-3978591324501330360 (1)]
+FROM bronze.[portwatch_disruptions_database(1)]
 WHERE lat IS NULL
    OR long IS NULL
    OR lat NOT BETWEEN -90 AND 90
@@ -217,7 +217,7 @@ GO
 -- 21. Negative Numeric / Geometry Values
 SELECT eventid, eventname, n_affectedports,
        Shape__Area, Shape__Length
-FROM bronze.[portwatch_disruptions_database_-3978591324501330360 (1)]
+FROM bronze.[portwatch_disruptions_database(1)]
 WHERE n_affectedports < 0
    OR Shape__Area < 0
    OR Shape__Length < 0;
@@ -233,12 +233,12 @@ SELECT
     COUNT(NULLIF(LTRIM(RTRIM(affectedports)), '')) AS NonEmptyAffectedPorts,
     COUNT(NULLIF(LTRIM(RTRIM(pageid)), '')) AS NonEmptyPageID,
     COUNT(affectedpopulation) AS NonNullAffectedPopulation
-FROM bronze.[portwatch_disruptions_database_-3978591324501330360 (1)];
+FROM bronze.[portwatch_disruptions_database(1)];
 GO
 
 -- 23. Event Type Distribution
 SELECT eventtype, COUNT(*) AS EventCount
-FROM bronze.[portwatch_disruptions_database_-3978591324501330360 (1)]
+FROM bronze.[portwatch_disruptions_database(1)]
 GROUP BY eventtype
 ORDER BY EventCount DESC;
 GO
@@ -246,11 +246,7 @@ GO
 -- 24. Sample of Affected Ports
 SELECT TOP 20
     eventid, eventname, affectedports, n_affectedports
-FROM bronze.[portwatch_disruptions_database_-3978591324501330360 (1)]
+FROM bronze.[portwatch_disruptions_database(1)]
 WHERE affectedports IS NOT NULL
 ORDER BY eventid;
 GO
-
-/* =====================================================
-   END OF BRONZE VALIDATION
-   ===================================================== */
