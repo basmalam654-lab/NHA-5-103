@@ -15,11 +15,11 @@ Users: a shipping and logistics manager and an executive finance manager. Output
 
 | Member | Phase 1 | Phase 2 | Phase 3 |
 |---|---|---|---|
-| 1 | Sources, schema, relationships | Data quality and extra cleaning | Data model and relationships |
-| 2 | Bronze layer | Feature engineering | DAX measures and KPIs |
-| 3 | Silver layer | Univariate EDA | Executive Overview dashboard |
-| 4 | Gold layer | Bivariate and multivariate EDA | Detailed analysis dashboard |
-| 5 | Validation queries and KPI checks | Combine results, business insights | Extra page, filters and interactions |
+| 1. Shahd Wahid | Sources, schema, relationships | Data quality and extra cleaning | Data model and relationships |
+| 2. Basmala Mahmoud | Bronze layer | Feature engineering | DAX measures and KPIs |
+| 3. Tasbeeh Mohamed | Silver layer | Univariate EDA | Executive Overview dashboard |
+| 4. Aisha Taher | Gold layer | Bivariate and multivariate EDA | Detailed analysis dashboard |
+| 5.Abrar Mohamed | Validation queries and KPI checks | Combine results, business insights | Extra page, filters and interactions |
 
 ## Folders
 

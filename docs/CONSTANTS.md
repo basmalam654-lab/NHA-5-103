@@ -10,12 +10,9 @@ To change one: open a pull request that edits this file, and the leader approves
 | Folder | `data/raw/snapshot_2026-11-08/` |
 | Daily file | `Daily_Chokepoints_Data.csv` - 80,332 rows, 21 columns |
 | Chokepoints file | `PortWatch_chokepoints_database.csv` - 28 rows |
-| Events file | `portwatch_disruptions_database_-3978591324501330360.csv` - 132 rows |
+| Events file | `portwatch_disruptions_database.csv` - 132 rows |
 | Date range | 2019-01-01 to 2026-11-08 (2,869 days x 28 chokepoints) |
-| Integrity check | `CHECKSUMS.txt` in the same folder |
 
-Check your copy (Windows PowerShell): `Get-FileHash <file> -Algorithm SHA256` and compare with `CHECKSUMS.txt`.
-Mac/Linux: `sha256sum -c CHECKSUMS.txt`.
 
 ## 2. Architecture
 
