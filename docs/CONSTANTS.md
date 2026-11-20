@@ -28,15 +28,17 @@ To change one: open a pull request that edits this file, and the leader approves
 
 | Table | One row per |
 |---|---|
-| `fact` table | chokepoint per day |
+| `fact_daily_summary` | chokepoint per day |
+| `fact_daily_transit` | chokepoint per day per vessel type |
 | `dim_chokepoint` | chokepoint |
 | `dim_date` | calendar day |
+| `dim_vessel_type` | vessel type |
 | `dim_event` | event |
 | `bridge_event_chokepoint` | event + chokepoint pair |
 
 ## 4. Naming rules
 
-- Everything is lowercase `snake_case` (tables, columns, files, folders).
+- Everything is lowercase `snake_case` (tables, columns, files, folders). Exception: Bronze tables, their columns and the raw source CSV files keep the original source names.
 - Table prefixes: `dim_`, `fact_`, `bridge_`.
 - Branches: `feature/m<member number>-<short-task>` (example `feature/m3-silver-daily`).
 - Commit prefixes: `feat:`, `fix:`, `docs:`, `test:`, `chore:`.
@@ -47,12 +49,12 @@ To change one: open a pull request that edits this file, and the leader approves
 
 | Item | Value |
 |---|---|
-| Chokepoint key | `chokepoint_code` (example `chokepoint1`) |
+| Chokepoint key | `chokepoint_id` (surrogate key; `chokepoint_code` is the unique business code, example `chokepoint1`) |
 | Date key | `date_key`, integer like `20261028` |
 | Event key | `event_id` (the raw `eventid`) |
 | Renames (only in Silver) | `portid` -> `chokepoint_code`, `portname` -> `chokepoint_name` |
-| `dim_chokepoint` columns | `chokepoint_code`, `chokepoint_name`, `fullname`, `country`, `ISO3`, `continent`, `lat`, `lon` |
-| Tables in Gold | fact table, `dim_chokepoint`, `dim_date` (fuller version from the architecture file), `dim_event`, `bridge_event_chokepoint` |
+| `dim_chokepoint` columns | `chokepoint_id`, `chokepoint_code`, `chokepoint_name`, `fullname`, `country`, `iso3`, `continent`, `latitude`, `longitude` |
+| Tables in Gold | `dim_chokepoint`, `dim_date` (fuller version from the architecture file), `dim_vessel_type`, `dim_event`, `fact_daily_summary`, `fact_daily_transit`, `bridge_event_chokepoint` |
 | Capacity-total check | Compare counts only |
 
 ## 6. Date formats

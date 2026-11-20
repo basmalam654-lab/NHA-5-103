@@ -199,10 +199,14 @@ HAVING COUNT(*) > 1;
 GO
 
 -- 19. Event Date Validation
+-- (dates are raw text, so they are converted to datetime2 before they are compared)
 SELECT eventid, eventname, fromdate, todate
 FROM bronze.[portwatch_disruptions_database(1)]
 WHERE fromdate IS NULL
-   OR (todate IS NOT NULL AND todate < fromdate);
+   OR TRY_CONVERT(datetime2, fromdate, 101) IS NULL
+   OR (todate IS NOT NULL
+       AND (TRY_CONVERT(datetime2, todate, 101) IS NULL
+            OR TRY_CONVERT(datetime2, todate, 101) < TRY_CONVERT(datetime2, fromdate, 101)));
 GO
 
 -- 20. Event Coordinates Validation

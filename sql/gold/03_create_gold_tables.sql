@@ -107,7 +107,7 @@ CREATE TABLE gold.dim_event
     event_type VARCHAR(20) NOT NULL,
     event_name VARCHAR(150) NOT NULL,
     alert_level VARCHAR(50),
-    country VARCHAR(100),
+    country VARCHAR(300),
     start_date DATE NOT NULL,
     end_date DATE,
     severity_text VARCHAR(255),
