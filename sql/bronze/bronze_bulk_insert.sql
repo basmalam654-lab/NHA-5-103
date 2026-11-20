@@ -1,7 +1,7 @@
 /* =====================================================
    Load the 3 raw CSV files into the Bronze tables (BULK INSERT)
 
-   Before you run (run create_bronze_tables.sql first):
+   Before you run (run creation_of_bronze_tables.sql first):
      Change @data_folder below to the folder where YOUR copy of the repo
         keeps data\raw\snapshot_2026-11-08\
    ===================================================== */
@@ -54,7 +54,7 @@ BEGIN TRY
 
 END TRY
 BEGIN CATCH
-    PRINT 'LOAD FAILED. Read the error below. Common causes: wrong @data_folder,';
+    PRINT 'LOAD FAILED. Common causes: wrong @data_folder,';
     PRINT 'wrong @row_terminator, or the SQL Server service cannot read the folder.';
     THROW;
 END CATCH;

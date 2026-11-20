@@ -1,5 +1,5 @@
 /* =====================================================
-   Creatation of the 3 Bronze tables
+   Creation of the 3 Bronze tables
    ===================================================== */
 
 USE global_shipping_dw;
