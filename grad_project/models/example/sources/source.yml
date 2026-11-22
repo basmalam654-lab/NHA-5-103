@@ -1,0 +1,204 @@
+version: 2
+
+sources:
+  - name: portwatch
+    description: >
+      Raw PortWatch data (IMF PortWatch) about maritime chokepoints and natural-disaster
+      disruptions. Loaded as-is (all columns are text) by Scripts/load_staging.py into the
+      staging schema. Type casting and cleaning happen in the bronze layer.
+      The tables are append-only: when a row changes in a later file, a new version is
+      added instead of overwriting the old one, so one key can appear more than once.
+      Always take the latest version per key (highest _row_id).
+    database: global_shipping_dw
+    schema: staging
+    loaded_at_field: "CAST(_loaded_at AS DATETIME2)"
+
+    tables:
+      # ------------------------------------------------------------------
+      - name: portwatch_daily_chokepoints
+        description: >
+          Daily vessel transits and capacity for each of the 28 chokepoints.
+          Grain: one row per date and chokepoint. Key: date + portid.
+        columns:
+          - name: date
+            description: "Transit date, text in YYYY/MM/DD format (e.g. 2019/01/01)."
+            tests: [not_null]
+          - name: year
+            description: "Year part of the date."
+          - name: month
+            description: "Month part of the date (1-12)."
+          - name: day
+            description: "Day of the month."
+          - name: portid
+            description: "Chokepoint identifier (e.g. chokepoint1). Joins to portwatch_chokepoints.portid."
+            tests: [not_null]
+          - name: portname
+            description: "Chokepoint name (e.g. Suez Canal)."
+          - name: n_container
+            description: "Number of container ships that transited."
+          - name: n_dry_bulk
+            description: "Number of dry bulk carriers that transited."
+          - name: n_general_cargo
+            description: "Number of general cargo ships that transited."
+          - name: n_roro
+            description: "Number of roll-on/roll-off (RoRo) vessels that transited."
+          - name: n_tanker
+            description: "Number of tankers that transited."
+          - name: n_cargo
+            description: "Number of cargo vessels (container + dry bulk + general cargo + RoRo, tankers excluded)."
+          - name: n_total
+            description: "Total number of vessels (n_cargo + n_tanker)."
+          - name: capacity_container
+            description: "Estimated capacity of the container ships that transited (metric tons)."
+          - name: capacity_dry_bulk
+            description: "Estimated capacity of the dry bulk carriers that transited (metric tons)."
+          - name: capacity_general_cargo
+            description: "Estimated capacity of the general cargo ships that transited (metric tons)."
+          - name: capacity_roro
+            description: "Estimated capacity of the RoRo vessels that transited (metric tons)."
+          - name: capacity_tanker
+            description: "Estimated capacity of the tankers that transited (metric tons)."
+          - name: capacity_cargo
+            description: "Estimated capacity of all cargo vessels, tankers excluded (metric tons)."
+          - name: capacity
+            description: "Estimated total capacity of all vessels (metric tons)."
+          - name: ObjectId
+            description: "Row number assigned by the ArcGIS export. Not stable between downloads, do not use as a key."
+          - name: _row_id
+            description: "Auto-increment id of the stored row. A higher value means a later version."
+          - name: _loaded_at
+            description: "UTC time of the load run that inserted this row."
+          - name: _batch_id
+            description: "Unique id (GUID) of the load run that inserted this row."
+          - name: _source_file
+            description: "Name of the CSV file this row came from."
+          - name: _row_hash
+            description: "SHA-256 of the row values (ObjectId excluded). Used to detect changed rows."
+
+      # ------------------------------------------------------------------
+      - name: portwatch_chokepoints
+        description: >
+          Reference table of the 28 chokepoints with their location, vessel totals and top
+          industries. Grain: one row per chokepoint. Key: portid.
+        columns:
+          - name: X
+            description: "Longitude in Web Mercator meters (EPSG:3857)."
+          - name: Y
+            description: "Latitude in Web Mercator meters (EPSG:3857)."
+          - name: portid
+            description: "Chokepoint identifier (e.g. chokepoint1)."
+            tests: [not_null]
+          - name: portname
+            description: "Chokepoint name."
+          - name: country
+            description: "Country. Empty for all chokepoints (kept for compatibility with the PortWatch ports table)."
+          - name: ISO3
+            description: "ISO 3-letter country code. Empty for all chokepoints."
+          - name: continent
+            description: "Continent. Empty for all chokepoints."
+          - name: fullname
+            description: "Full display name of the chokepoint."
+          - name: lat
+            description: "Latitude in decimal degrees (WGS84)."
+          - name: lon
+            description: "Longitude in decimal degrees (WGS84)."
+          - name: vessel_count_total
+            description: "Total vessel count for the chokepoint, all vessel types."
+          - name: vessel_count_container
+            description: "Vessel count, container ships."
+          - name: vessel_count_dry_bulk
+            description: "Vessel count, dry bulk carriers."
+          - name: vessel_count_general_cargo
+            description: "Vessel count, general cargo ships."
+          - name: vessel_count_RoRo
+            description: "Vessel count, RoRo vessels."
+          - name: vessel_count_tanker
+            description: "Vessel count, tankers."
+          - name: industry_top1
+            description: "Largest industry (trade category) served by the chokepoint."
+          - name: industry_top2
+            description: "Second largest industry served by the chokepoint."
+          - name: industry_top3
+            description: "Third largest industry served by the chokepoint."
+          - name: share_country_maritime_import
+            description: "Share of the country's maritime imports. Empty for all chokepoints."
+          - name: share_country_maritime_export
+            description: "Share of the country's maritime exports. Empty for all chokepoints."
+          - name: LOCODE
+            description: "UN/LOCODE. Empty for all chokepoints."
+          - name: pageid
+            description: "Id of the chokepoint page in the PortWatch portal."
+          - name: countrynoaccents
+            description: "Country name without accents. Empty for all chokepoints."
+          - name: ObjectId
+            description: "Row number assigned by the ArcGIS export. Not stable between downloads, do not use as a key."
+          - name: _row_id
+            description: "Auto-increment id of the stored row. A higher value means a later version."
+          - name: _loaded_at
+            description: "UTC time of the load run that inserted this row."
+          - name: _batch_id
+            description: "Unique id (GUID) of the load run that inserted this row."
+          - name: _source_file
+            description: "Name of the CSV file this row came from."
+          - name: _row_hash
+            description: "SHA-256 of the row values (ObjectId excluded). Used to detect changed rows."
+
+      # ------------------------------------------------------------------
+      - name: portwatch_disruptions
+        description: >
+          Natural-disaster events that disrupted ports (2018-2026), with the ports and
+          population affected. Grain: one row per event. Key: eventid.
+        columns:
+          - name: eventid
+            description: "Unique event identifier."
+            tests: [not_null]
+          - name: eventtype
+            description: "Event type code: TC tropical cyclone, EQ earthquake, FL flood, DR drought, WF wildfire, VO volcano, OT other."
+          - name: eventname
+            description: "Short event name (e.g. IDAI-19)."
+          - name: htmlname
+            description: "Display name with the event type (e.g. Tropical Cyclone IDAI-19)."
+          - name: htmldescription
+            description: "Free-text description of the event, countries and dates."
+          - name: alertlevel
+            description: "Alert level of the event (RED or ORANGE)."
+          - name: country
+            description: "Affected countries, separated by semicolons."
+          - name: fromdate
+            description: "Event start, text in M/D/YYYY h:mm:ss AM/PM format."
+          - name: year
+            description: "Year of the event."
+          - name: todate
+            description: "Event end, text in M/D/YYYY h:mm:ss AM/PM format."
+          - name: severitytext
+            description: "Description of the event severity (e.g. maximum wind speed)."
+          - name: lat
+            description: "Latitude of the event centre in decimal degrees."
+          - name: long
+            description: "Longitude of the event centre in decimal degrees."
+          - name: editdate
+            description: "Last edit time of the event record in the source, text."
+          - name: affectedports
+            description: "Ids of the affected ports, separated by semicolons (e.g. port137; port784)."
+          - name: n_affectedports
+            description: "Number of affected ports."
+          - name: affectedpopulation
+            description: "Affected population as free text (e.g. 1.9 million in Category 1 or higher)."
+          - name: pageid
+            description: "Id of the event page in the PortWatch portal."
+          - name: ObjectId
+            description: "Row number assigned by the ArcGIS export. Not stable between downloads, do not use as a key."
+          - name: Shape__Area
+            description: "Area of the event footprint polygon (ArcGIS geometry field)."
+          - name: Shape__Length
+            description: "Perimeter of the event footprint polygon (ArcGIS geometry field)."
+          - name: _row_id
+            description: "Auto-increment id of the stored row. A higher value means a later version."
+          - name: _loaded_at
+            description: "UTC time of the load run that inserted this row."
+          - name: _batch_id
+            description: "Unique id (GUID) of the load run that inserted this row."
+          - name: _source_file
+            description: "Name of the CSV file this row came from."
+          - name: _row_hash
+            description: "SHA-256 of the row values (ObjectId excluded). Used to detect changed rows."
