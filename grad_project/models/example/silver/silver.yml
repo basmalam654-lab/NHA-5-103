@@ -1,0 +1,170 @@
+version: 2
+models:
+- name: silver_chokepoints
+  description: Cleaned chokepoint table, one row per chokepoint. Columns that are empty for every chokepoint are dropped.
+  columns:
+  - name: chokepoint_id
+    description: Chokepoint id.
+    data_tests:
+    - unique
+    - not_null
+  - name: chokepoint_name
+    description: Chokepoint name.
+  - name: lat
+    description: Latitude (WGS84).
+  - name: lon
+    description: Longitude (WGS84).
+  - name: x_mercator
+    description: Web Mercator X (EPSG:3857).
+  - name: y_mercator
+    description: Web Mercator Y (EPSG:3857).
+  - name: vessel_count_total
+    description: Total vessel count.
+  - name: vessel_count_container
+    description: Container ship count.
+  - name: vessel_count_dry_bulk
+    description: Dry bulk carrier count.
+  - name: vessel_count_general_cargo
+    description: General cargo ship count.
+  - name: vessel_count_roro
+    description: RoRo vessel count.
+  - name: vessel_count_tanker
+    description: Tanker count.
+  - name: industry_top1
+    description: Largest industry served.
+  - name: industry_top2
+    description: Second largest industry served.
+  - name: industry_top3
+    description: Third largest industry served.
+  - name: pageid
+    description: PortWatch page id.
+- name: silver_daily_chokepoints
+  description: Daily vessel transits and capacity per chokepoint, with chokepoint name and location, date parts and ratios. One row per date and chokepoint.
+  columns:
+  - name: transit_date
+    description: Transit date.
+    data_tests:
+    - not_null
+  - name: transit_year
+    description: Year of the transit date.
+  - name: transit_month
+    description: Month of the transit date (1-12).
+  - name: transit_quarter
+    description: Quarter of the transit date (1-4).
+  - name: transit_weekday
+    description: Weekday name (depends on the server language).
+  - name: chokepoint_id
+    description: Chokepoint id.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('silver_chokepoints')
+          field: chokepoint_id
+  - name: chokepoint_name
+    description: Chokepoint name.
+  - name: lat
+    description: Chokepoint latitude.
+  - name: lon
+    description: Chokepoint longitude.
+  - name: n_container
+    description: Container ships that transited.
+  - name: n_dry_bulk
+    description: Dry bulk carriers that transited.
+  - name: n_general_cargo
+    description: General cargo ships that transited.
+  - name: n_roro
+    description: RoRo vessels that transited.
+  - name: n_tanker
+    description: Tankers that transited.
+  - name: n_cargo
+    description: Cargo vessels (tankers excluded).
+  - name: n_total
+    description: All vessels.
+  - name: capacity_container
+    description: Capacity of container ships (metric tons).
+  - name: capacity_dry_bulk
+    description: Capacity of dry bulk carriers (metric tons).
+  - name: capacity_general_cargo
+    description: Capacity of general cargo ships (metric tons).
+  - name: capacity_roro
+    description: Capacity of RoRo vessels (metric tons).
+  - name: capacity_tanker
+    description: Capacity of tankers (metric tons).
+  - name: capacity_cargo
+    description: Capacity of cargo vessels (metric tons).
+  - name: capacity
+    description: Total capacity (metric tons).
+  - name: tanker_share_of_vessels
+    description: n_tanker divided by n_total (0-1). Empty when n_total is 0.
+  - name: avg_capacity_per_vessel
+    description: capacity divided by n_total (metric tons per vessel). Empty when n_total is 0.
+- name: silver_disruptions
+  description: One row per natural-disaster disruption event, with readable event type, duration and affected population as a number.
+  columns:
+  - name: event_id
+    description: Event id.
+    data_tests:
+    - unique
+    - not_null
+  - name: event_type
+    description: Event type code.
+  - name: event_type_name
+    description: Readable event type.
+  - name: event_name
+    description: Short event name.
+  - name: event_title
+    description: Display name with event type.
+  - name: event_description
+    description: Free-text description.
+  - name: alert_level
+    description: Alert level (RED or ORANGE).
+  - name: countries
+    description: Affected countries separated by semicolons.
+  - name: start_at
+    description: Event start.
+  - name: end_at
+    description: Event end. Empty when the source has no end date.
+  - name: duration_days
+    description: Days between start and end (hour precision). Empty when end_at is empty.
+  - name: severity_text
+    description: Severity description.
+  - name: lat
+    description: Latitude of the event centre.
+  - name: lon
+    description: Longitude of the event centre.
+  - name: affected_ports
+    description: Affected port ids separated by semicolons.
+  - name: n_affected_ports
+    description: Number of affected ports.
+  - name: affected_population_text
+    description: Affected population as written in the source.
+  - name: affected_population
+    description: Approximate affected population as a number ("1.9 million" becomes 1900000). Empty when the source has none.
+  - name: last_edited_at
+    description: Last edit time in the source.
+- name: silver_disruption_ports
+  description: 'Bridge table: one row per event and affected port, from the semicolon-separated affected_ports list.'
+  columns:
+  - name: event_id
+    description: Event id.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('silver_disruptions')
+          field: event_id
+  - name: port_id
+    description: Affected port id (e.g. port137).
+    data_tests:
+    - not_null
+  - name: event_type
+    description: Event type code.
+  - name: event_type_name
+    description: Readable event type.
+  - name: event_name
+    description: Short event name.
+  - name: start_at
+    description: Event start.
+  - name: end_at
+    description: Event end.
